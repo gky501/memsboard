@@ -5,6 +5,7 @@
   <title>MEMS Board</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <!-- Core dashboard styling only -->
   <link rel="stylesheet" href="media/css/core.css" />
 </head>
 
@@ -14,6 +15,7 @@
     <header class="board-header">
       <div class="brand-block">
         <div class="brand-mark">M</div>
+
         <div>
           <div class="board-kicker">MEMS Command Board</div>
           <h1 id="pageTitle">Summary</h1>
@@ -34,7 +36,7 @@
     </header>
 
     <main id="appRoot" class="board-main">
-      <!-- App content loads here -->
+      <!-- Tab/app content loads here from core.js -->
     </main>
 
     <nav class="board-tabs" aria-label="Dashboard tabs">
@@ -71,6 +73,7 @@
 
   </div>
 
+  <!-- Core dashboard router / clock / tab loader -->
   <script src="media/js/core.js"></script>
 </body>
 </html>

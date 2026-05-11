@@ -365,3 +365,11 @@ button {
   font-style: normal;
   font-display: block;
 }
+.las,
+.la {
+  font-family: "Line Awesome Free";
+  font-weight: 900;
+  font-style: normal;
+  line-height: 1;
+  display: inline-block;
+}

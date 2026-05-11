@@ -35,9 +35,76 @@ const apps = {
   },
 
   calendar: {
-    title: "Calendar",
-    render: renderCalendar
-  },
+  title: "Calendar",
+  css: "media/css/calendar.css",
+  js: "media/js/calendar.js",
+  render: () => `
+    <section class="dashboard-grid app-screen calendar-screen">
+
+      <article class="card hero-card calendar-hero">
+        <div class="hero-status">
+          <span class="status-dot good"></span>
+          Calendar Feed
+        </div>
+
+        <div class="hero-message">
+          <h2 id="calendarHeroDate">Loading</h2>
+          <p id="calendarHeroText">Reading calendar feed...</p>
+        </div>
+
+        <div class="metric-line">
+          <span>Upcoming Events</span>
+          <span id="calendarUpcomingCount">--</span>
+        </div>
+      </article>
+
+      <article class="card mini-card">
+        <p class="card-title">Today</p>
+        <div class="card-big-number" id="calendarTodayCount">--</div>
+        <p class="card-subtext">Events currently listed for today.</p>
+        <div class="metric-line">
+          <span>Status</span>
+          <span id="calendarTodayStatus">Loading</span>
+        </div>
+      </article>
+
+      <article class="card mini-card">
+        <p class="card-title">Next Event</p>
+        <div class="card-big-number" id="calendarNextTime">--</div>
+        <p class="card-subtext" id="calendarNextTitle">Checking feed...</p>
+        <div class="metric-line">
+          <span>Source</span>
+          <span>ICS</span>
+        </div>
+      </article>
+
+      <article class="card wide-card calendar-list-card">
+        <p class="card-title">Today at MEMS</p>
+        <div class="card-list" id="calendarTodayList">
+          <div class="list-row">
+            <div class="row-icon">↻</div>
+            <div>
+              <div class="row-title">Loading calendar</div>
+              <div class="row-detail">Reading reachcalendar.ics...</div>
+            </div>
+            <div class="row-tag">Wait</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card wide-card calendar-list-card">
+        <p class="card-title">Upcoming</p>
+        <div class="card-list" id="calendarUpcomingList"></div>
+      </article>
+
+    </section>
+  `,
+  afterRender: () => {
+    if (window.MEMSCalendar && typeof window.MEMSCalendar.init === "function") {
+      window.MEMSCalendar.init();
+    }
+  }
+},
 
   tools: {
     title: "Tools",
@@ -56,15 +123,29 @@ function loadCSS(path) {
   loadedAssets.add(path);
 }
 
-function loadJS(path) {
-  if (!path || loadedAssets.has(path)) return;
+function loadJS(path, callback) {
+  if (!path) return;
+
+  if (loadedAssets.has(path)) {
+    if (typeof callback === "function") callback();
+    return;
+  }
 
   const script = document.createElement("script");
   script.src = path;
   script.defer = true;
-  document.body.appendChild(script);
 
-  loadedAssets.add(path);
+  script.onload = () => {
+    loadedAssets.add(path);
+    if (typeof callback === "function") callback();
+  };
+
+  script.onerror = () => {
+    console.error(`Could not load script: ${path}`);
+    setStatus("Script Error", "bad");
+  };
+
+  document.body.appendChild(script);
 }
 
 function loadApp(appName) {
@@ -78,9 +159,18 @@ function loadApp(appName) {
   pageTitle.textContent = app.title;
 
   if (app.css) loadCSS(app.css);
-  if (app.js) loadJS(app.js);
 
   appRoot.innerHTML = app.render();
+
+  if (app.js) {
+    loadJS(app.js, () => {
+      if (typeof app.afterRender === "function") {
+        app.afterRender();
+      }
+    });
+  } else if (typeof app.afterRender === "function") {
+    app.afterRender();
+  }
 
   document.querySelectorAll(".tab-btn").forEach((button) => {
     button.classList.toggle("active", button.dataset.app === appName);

@@ -263,26 +263,6 @@ function renderWeatherDayGrid(days) {
   `).join("");
 }
 
-function renderForecastStrip(days) {
-  const container = document.getElementById("weatherForecastStrip");
-  if (!container) return;
-
-  container.innerHTML = days.map(day => `
-    <div class="forecast-day">
-      <div>
-        <div class="forecast-day-name">${escapeHTML(day.name)}</div>
-        <div class="forecast-icon">${day.icon}</div>
-        <div class="forecast-short">${escapeHTML(day.shortForecast)}</div>
-      </div>
-
-      <div>
-        <div class="forecast-temp">${day.high ?? "--"}°</div>
-        <div class="row-detail">Low ${day.low ?? "--"}° · ${escapeHTML(day.wind || "")}</div>
-      </div>
-    </div>
-  `).join("");
-}
-
 function renderAlerts(alerts) {
   const container = document.getElementById("weatherAlertsList");
   if (!container) return;

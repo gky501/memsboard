@@ -354,3 +354,16 @@ function setText(id, value) {
   const element = document.getElementById(id);
   if (element) element.textContent = value;
 }
+
+window.MEMSCalendar.loadEvents = async function () {
+  const response = await fetch("media/data/reachcalendar.ics", {
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Calendar file could not be loaded.");
+  }
+
+  const icsText = await response.text();
+  return parseICSCalendar(icsText);
+};

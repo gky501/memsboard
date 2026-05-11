@@ -135,8 +135,8 @@ function renderWeatherChart(days) {
   if (!container || !days.length) return;
 
   const width = 1200;
-  const height = 360;
-  const padding = { top: 24, right: 28, bottom: 64, left: 42 };
+  const height = 430;
+  const padding = { top: 50, right: 36, bottom: 72, left: 54 };
 
   const innerWidth = width - padding.left - padding.right;
   const innerHeight = height - padding.top - padding.bottom;

@@ -356,3 +356,12 @@ button {
     grid-template-columns: repeat(4, 1fr);
   }
 }
+@font-face {
+  font-family: "Line Awesome Free";
+  src:
+    url("../fonts/line-awesome/la-solid-900.woff2") format("woff2"),
+    url("../fonts/line-awesome/la-solid-900.woff") format("woff");
+  font-weight: 900;
+  font-style: normal;
+  font-display: block;
+}

@@ -216,7 +216,7 @@ function renderPioSignal(days, alerts) {
     const eventName = severeAlert.properties?.event || "Severe Weather";
     container.className = "pio-signal severe";
     container.innerHTML = `
-      <div class="row-icon">!</div>
+      <div class="row-icon"><i class="las la-exclamation-triangle"></i></div>
       <div>
         <div class="row-title">Weather post may be needed: ${escapeHTML(eventName)}</div>
         <div class="row-detail">Consider safety messaging, timing, affected areas, and reminder to have alerts enabled.</div>
@@ -229,7 +229,7 @@ function renderPioSignal(days, alerts) {
   if (maxHigh >= 95) {
     container.className = "pio-signal heat";
     container.innerHTML = `
-      <div class="row-icon">☀</div>
+      <div class="row-icon"><i class="las la-temperature-high"></i></div>
       <div>
         <div class="row-title">Heat safety post recommended</div>
         <div class="row-detail">Forecast highs suggest increased heat-related injury risk. Consider a post about hydration, checking on vulnerable neighbors, and calling 911 for heat emergency warning signs.</div>
@@ -241,7 +241,7 @@ function renderPioSignal(days, alerts) {
 
   container.className = "pio-signal";
   container.innerHTML = `
-    <div class="row-icon">✓</div>
+    <div class="row-icon"><i class="las la-check-circle"></i></div>
     <div>
       <div class="row-title">No immediate weather post signal</div>
       <div class="row-detail">No high heat or major severe-weather alert signal detected right now.</div>

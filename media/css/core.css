@@ -373,3 +373,14 @@ button {
   line-height: 1;
   display: inline-block;
 }
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tab-btn .las {
+  font-size: 1.15rem;
+}

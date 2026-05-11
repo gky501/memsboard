@@ -226,52 +226,77 @@ function renderWeatherShell() {
   return `
     <section class="dashboard-grid app-screen weather-screen">
 
-      <article class="card hero-card weather-now-card">
+      <article class="card wide-card weather-now-card">
         <div class="hero-status" id="weatherStatusPill">
           <span class="status-dot"></span>
           Weather Loading
         </div>
 
         <div class="hero-message">
-          <h2 id="weatherHeroTemp">--°</h2>
+          <h2 id="weatherHeroTemp">Loading</h2>
           <p id="weatherHeroText">Loading forecast for Little Rock / MEMS service area...</p>
         </div>
 
         <div class="weather-meta-grid">
           <div>
             <span>High</span>
-            <strong id="weatherTodayHigh">--°</strong>
+            <strong id="weatherTodayHigh">0°</strong>
           </div>
           <div>
             <span>Low</span>
-            <strong id="weatherTodayLow">--°</strong>
+            <strong id="weatherTodayLow">0°</strong>
           </div>
           <div>
             <span>Wind</span>
-            <strong id="weatherWind">--</strong>
+            <strong id="weatherWind">Pending</strong>
           </div>
         </div>
       </article>
 
       <article class="card mini-card">
         <p class="card-title">Active Alerts</p>
-        <div class="card-big-number" id="weatherAlertCount">--</div>
+        <div class="card-big-number" id="weatherAlertCount">0</div>
         <p class="card-subtext" id="weatherAlertText">Checking Arkansas alerts...</p>
       </article>
 
       <article class="card mini-card heat-card">
         <p class="card-title">Heat Risk</p>
-        <div class="card-big-number" id="weatherHeatLevel">--</div>
+        <div class="card-big-number" id="weatherHeatLevel">Pending</div>
         <p class="card-subtext" id="weatherHeatText">Checking forecast highs...</p>
       </article>
 
-      <article class="card wide-card forecast-card">
-        <p class="card-title">Week Forecast</p>
-        <div class="forecast-strip" id="weatherForecastStrip"></div>
+      <article class="card full-card weather-chart-card">
+        <div class="weather-chart-header">
+          <div>
+            <p class="card-title">7-Day Forecast</p>
+            <div class="weather-chart-subtitle">
+              High / low temperature trend with precipitation chances
+            </div>
+          </div>
+
+          <div class="chart-legend">
+            <span class="legend-item">
+              <span class="legend-swatch legend-high"></span>
+              High Temp
+            </span>
+            <span class="legend-item">
+              <span class="legend-swatch legend-low"></span>
+              Low Temp
+            </span>
+            <span class="legend-item">
+              <span class="legend-swatch legend-precip"></span>
+              Precip %
+            </span>
+          </div>
+        </div>
+
+        <div id="weatherWeeklyChart" class="weather-weekly-chart"></div>
+        <div id="weatherDayGrid" class="weather-day-grid"></div>
       </article>
 
       <article class="card wide-card">
         <p class="card-title">Hazard Outlook</p>
+
         <div class="hazard-box">
           <div>
             <h3>Graphical Hazardous Weather Outlook</h3>
@@ -279,6 +304,7 @@ function renderWeatherShell() {
               LZK hazard outlook for potential weather hazards through seven days.
             </p>
           </div>
+
           <a class="weather-link" href="https://www.weather.gov/erh/ghwo?wfo=lzk" target="_blank" rel="noopener">
             Open GHWO
           </a>
@@ -287,10 +313,10 @@ function renderWeatherShell() {
         <div class="card-list" id="weatherAlertsList"></div>
       </article>
 
-      <article class="card full-card">
+      <article class="card wide-card">
         <p class="card-title">PIO Signal</p>
         <div class="pio-signal" id="weatherPioSignal">
-          <div class="row-icon">↻</div>
+          <div class="row-icon"><i class="las la-sync"></i></div>
           <div>
             <div class="row-title">Checking forecast-driven post ideas</div>
             <div class="row-detail">Heat, severe weather, flooding, and safety messaging will appear here.</div>

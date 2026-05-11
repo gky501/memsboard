@@ -92,11 +92,6 @@ function renderWeather(periods, alerts) {
   renderPioSignal(days, activeAlerts);
 }
 
-  renderForecastStrip(days);
-  renderAlerts(activeAlerts);
-  renderHeatRisk(days);
-  renderPioSignal(days, activeAlerts);
-}
 
 function buildDailyForecast(periods) {
   const days = [];

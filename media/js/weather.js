@@ -65,7 +65,7 @@ function renderWeather(periods, alerts) {
   const low = getTodayLow(periods);
 
   setWeatherText("weatherStatusPill", `<span class="status-dot"></span> Forecast Loaded`, true);
-  setWeatherText("weatherHeroTemp", today?.temperature ? `${today.temperature}°` : "--°");
+  setWeatherText("weatherHeroTemp", today?.temperature ? `${today.temperature}°` : "Pending");
   setWeatherText(
     "weatherHeroText",
     today
@@ -73,9 +73,9 @@ function renderWeather(periods, alerts) {
       : "Forecast unavailable."
   );
 
-  setWeatherText("weatherTodayHigh", high ? `${high}°` : "--°");
-  setWeatherText("weatherTodayLow", low ? `${low}°` : "--°");
-  setWeatherText("weatherWind", today?.windSpeed || "--");
+  setWeatherText("weatherTodayHigh", high ? `${high}°` : "Pending");
+  setWeatherText("weatherTodayLow", low ? `${low}°` : "Pending");
+  setWeatherText("weatherWind", today?.windSpeed || "Pending");
 
   setWeatherText("weatherAlertCount", activeAlerts.length);
   setWeatherText(
@@ -84,6 +84,13 @@ function renderWeather(periods, alerts) {
       ? `${activeAlerts.length} active alert${activeAlerts.length === 1 ? "" : "s"} in Arkansas.`
       : "No active Arkansas alerts."
   );
+
+  renderWeatherChart(days);
+  renderWeatherDayGrid(days);
+  renderAlerts(activeAlerts);
+  renderHeatRisk(days);
+  renderPioSignal(days, activeAlerts);
+}
 
   renderForecastStrip(days);
   renderAlerts(activeAlerts);
@@ -99,30 +106,166 @@ function buildDailyForecast(periods) {
     const date = new Date(period.startTime);
     const key = date.toDateString();
 
-    if (!seen.has(key) && !period.isDaytime) return;
+    if (!period.isDaytime) return;
+    if (seen.has(key)) return;
 
-    if (!seen.has(key)) {
-      const night = periods.find(other => {
-        const otherDate = new Date(other.startTime);
-        return otherDate.toDateString() === key && other.isDaytime === false;
-      });
+    const night = periods.find(other => {
+      const otherDate = new Date(other.startTime);
+      return otherDate.toDateString() === key && other.isDaytime === false;
+    });
 
-      days.push({
-        name: period.name,
-        date,
-        high: period.temperature,
-        low: night?.temperature || null,
-        shortForecast: period.shortForecast,
-        detailedForecast: period.detailedForecast,
-        wind: period.windSpeed,
-        icon: getWeatherSymbol(period.shortForecast)
-      });
+    const precipDay = Number(period.probabilityOfPrecipitation?.value || 0);
+    const precipNight = Number(night?.probabilityOfPrecipitation?.value || 0);
 
-      seen.add(key);
-    }
+    days.push({
+      name: date.toLocaleDateString([], { weekday: "short" }),
+      fullName: period.name,
+      date,
+      high: Number(period.temperature || 0),
+      low: Number(night?.temperature || period.temperature || 0),
+      precip: Math.max(precipDay, precipNight),
+      shortForecast: period.shortForecast,
+      detailedForecast: period.detailedForecast,
+      wind: period.windSpeed,
+      icon: getWeatherSymbol(period.shortForecast)
+    });
+
+    seen.add(key);
   });
 
   return days.slice(0, 7);
+}
+function renderWeatherChart(days) {
+  const container = document.getElementById("weatherWeeklyChart");
+  if (!container || !days.length) return;
+
+  const width = 1200;
+  const height = 360;
+  const padding = { top: 24, right: 28, bottom: 64, left: 42 };
+
+  const innerWidth = width - padding.left - padding.right;
+  const innerHeight = height - padding.top - padding.bottom;
+
+  const highs = days.map(day => Number(day.high || 0));
+  const lows = days.map(day => Number(day.low || 0));
+  const precips = days.map(day => Number(day.precip || 0));
+
+  const tempMin = Math.floor((Math.min(...lows) - 4) / 5) * 5;
+  const tempMax = Math.ceil((Math.max(...highs) + 4) / 5) * 5;
+
+  const xStep = days.length > 1 ? innerWidth / (days.length - 1) : innerWidth;
+
+  const x = i => padding.left + (i * xStep);
+  const yTemp = value => padding.top + ((tempMax - value) / Math.max(tempMax - tempMin, 1)) * innerHeight;
+  const yPrecip = value => padding.top + ((100 - value) / 100) * innerHeight;
+
+  const tempGridValues = [];
+  for (let v = tempMax; v >= tempMin; v -= 10) {
+    tempGridValues.push(v);
+  }
+
+  const highPoints = days.map((day, i) => ({ x: x(i), y: yTemp(day.high), value: day.high }));
+  const lowPoints = days.map((day, i) => ({ x: x(i), y: yTemp(day.low), value: day.low }));
+
+  const highPath = buildSmoothPath(highPoints);
+  const lowPath = buildSmoothPath(lowPoints);
+
+  const gridLines = tempGridValues.map(value => {
+    const y = yTemp(value);
+    return `
+      <line class="weather-chart-grid-line" x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}"></line>
+      <text class="weather-chart-grid-label" x="6" y="${y + 4}">${value}°</text>
+    `;
+  }).join("");
+
+  const precipBars = days.map((day, i) => {
+    const barWidth = 48;
+    const barHeight = (Math.max(0, day.precip) / 100) * innerHeight;
+    const barX = x(i) - (barWidth / 2);
+    const barY = padding.top + innerHeight - barHeight;
+
+    return `
+      <rect
+        class="weather-chart-precip-bar"
+        x="${barX}"
+        y="${barY}"
+        width="${barWidth}"
+        height="${barHeight}"
+        rx="4"
+      ></rect>
+      <text class="weather-chart-precip-label" x="${x(i)}" y="${barY - 8}" text-anchor="middle">
+        ${day.precip}%
+      </text>
+    `;
+  }).join("");
+
+  const dayLabels = days.map((day, i) => `
+    <text class="weather-chart-day-label" x="${x(i)}" y="${height - 20}" text-anchor="middle">
+      ${escapeHTML(day.name)}
+    </text>
+  `).join("");
+
+  const highDots = highPoints.map(point => `
+    <circle class="weather-chart-high-dot" cx="${point.x}" cy="${point.y}" r="5"></circle>
+    <text class="weather-chart-temp-label-high" x="${point.x}" y="${point.y - 12}" text-anchor="middle">
+      ${point.value}°
+    </text>
+  `).join("");
+
+  const lowDots = lowPoints.map(point => `
+    <circle class="weather-chart-low-dot" cx="${point.x}" cy="${point.y}" r="4"></circle>
+    <text class="weather-chart-temp-label-low" x="${point.x}" y="${point.y + 18}" text-anchor="middle">
+      ${point.value}°
+    </text>
+  `).join("");
+
+  container.innerHTML = `
+    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="7 day weather chart">
+      ${gridLines}
+      ${precipBars}
+      <path class="weather-chart-high-line" d="${highPath}"></path>
+      <path class="weather-chart-low-line" d="${lowPath}"></path>
+      ${highDots}
+      ${lowDots}
+      ${dayLabels}
+    </svg>
+  `;
+}
+function buildSmoothPath(points) {
+  if (!points.length) return "";
+
+  let d = `M ${points[0].x} ${points[0].y}`;
+
+  for (let i = 1; i < points.length; i++) {
+    const prev = points[i - 1];
+    const curr = points[i];
+    const midX = (prev.x + curr.x) / 2;
+
+    d += ` Q ${midX} ${prev.y}, ${curr.x} ${curr.y}`;
+  }
+
+  return d;
+}
+
+function renderWeatherDayGrid(days) {
+  const container = document.getElementById("weatherDayGrid");
+  if (!container || !days.length) return;
+
+  container.innerHTML = days.map(day => `
+    <div class="weather-day-tile">
+      <div class="weather-day-top">
+        <div class="weather-day-name">${escapeHTML(day.name)}</div>
+        <div class="weather-day-icon">${day.icon}</div>
+      </div>
+
+      <div class="weather-day-condition">${escapeHTML(day.shortForecast)}</div>
+
+      <div class="weather-day-meta">
+        High ${day.high}° · Low ${day.low}°<br>
+        Precip ${day.precip}% · ${escapeHTML(day.wind || "")}
+      </div>
+    </div>
+  `).join("");
 }
 
 function renderForecastStrip(days) {

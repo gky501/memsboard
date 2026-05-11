@@ -1,7 +1,13 @@
 const appRoot = document.getElementById("appRoot");
 const pageTitle = document.getElementById("pageTitle");
 const loadedAssets = new Set();
+const REFRESH_EVERY_MS = 5 * 60 * 1000;
+const INACTIVITY_RESET_MS = 60 * 60 * 1000;
 
+const STORAGE_KEYS = {
+  activeApp: "memsboard.activeApp",
+  lastActivity: "memsboard.lastActivity"
+};
 const apps = {
   command: {
     title: "Command",
@@ -45,7 +51,44 @@ const apps = {
     render: () => renderPlaceholder("Tools", "Quick links and system shortcuts will live here.")
   }
 };
+function markUserActivity() {
+  localStorage.setItem(STORAGE_KEYS.lastActivity, String(Date.now()));
+}
 
+function getLastActivity() {
+  return Number(localStorage.getItem(STORAGE_KEYS.lastActivity) || Date.now());
+}
+
+function getStartupApp() {
+  const savedApp = localStorage.getItem(STORAGE_KEYS.activeApp) || "command";
+  const lastActivity = getLastActivity();
+  const inactiveFor = Date.now() - lastActivity;
+
+  if (inactiveFor >= INACTIVITY_RESET_MS) {
+    localStorage.setItem(STORAGE_KEYS.activeApp, "command");
+    return "command";
+  }
+
+  return apps[savedApp] ? savedApp : "command";
+}
+
+function startAutoRefresh() {
+  setInterval(() => {
+    location.reload();
+  }, REFRESH_EVERY_MS);
+}
+
+function setupActivityTracking() {
+  ["click", "touchstart", "keydown", "pointerdown"].forEach(eventName => {
+    window.addEventListener(eventName, markUserActivity, {
+      passive: true
+    });
+  });
+
+  if (!localStorage.getItem(STORAGE_KEYS.lastActivity)) {
+    markUserActivity();
+  }
+}
 function loadCSS(path) {
   if (!path || loadedAssets.has(path)) return;
 
@@ -84,6 +127,8 @@ function loadJS(path, callback) {
 function loadApp(appName) {
   const app = apps[appName];
   if (!app) return;
+  
+  localStorage.setItem(STORAGE_KEYS.activeApp, appName);
 
   pageTitle.textContent = app.title;
 
@@ -295,7 +340,13 @@ document.querySelectorAll(".tab-btn").forEach(button => {
   });
 });
 
+setupActivityTracking();
+
 updateClock();
 setInterval(updateClock, 1000);
+
+loadApp(getStartupApp());
+
+startAutoRefresh();
 
 loadApp("command");

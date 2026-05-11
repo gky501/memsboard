@@ -5,75 +5,40 @@
   <title>MEMS Board</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Core dashboard styling only -->
   <link rel="stylesheet" href="media/css/core.css" />
 </head>
 
 <body>
-  <div class="mems-board-shell">
+  <div class="board-shell">
 
     <header class="board-header">
-      <div class="brand-block">
-        <div class="brand-mark">M</div>
-
-        <div>
-          <div class="board-kicker">MEMS Command Board</div>
-          <h1 id="pageTitle">Summary</h1>
-        </div>
+      <div>
+        <div class="board-kicker">Personal Command Board</div>
+        <h1 id="pageTitle">Command</h1>
       </div>
 
-      <div class="header-right">
-        <div class="system-pill" id="refreshStatus">
-          <span class="status-dot good"></span>
-          Live
-        </div>
-
-        <div class="board-clock">
-          <div id="clockTime">--:--</div>
-          <div id="clockDate">Loading date...</div>
-        </div>
+      <div class="board-clock">
+        <div id="clockTime">--:--</div>
+        <div id="clockDate">Loading...</div>
       </div>
     </header>
 
     <main id="appRoot" class="board-main">
-      <!-- Tab/app content loads here from core.js -->
+      <!-- App loads here -->
     </main>
 
     <nav class="board-tabs" aria-label="Dashboard tabs">
-      <button class="tab-btn active" data-app="summary">
-        <span class="tab-icon">◆</span>
-        <span>Summary</span>
-      </button>
-
-      <button class="tab-btn" data-app="weather">
-        <span class="tab-icon">☈</span>
-        <span>Weather</span>
-      </button>
-
-      <button class="tab-btn" data-app="analytics">
-        <span class="tab-icon">◈</span>
-        <span>Analytics</span>
-      </button>
-
-      <button class="tab-btn" data-app="media">
-        <span class="tab-icon">◉</span>
-        <span>Media Watch</span>
-      </button>
-
-      <button class="tab-btn" data-app="calendar">
-        <span class="tab-icon">▣</span>
-        <span>Calendar</span>
-      </button>
-
-      <button class="tab-btn" data-app="tools">
-        <span class="tab-icon">⚙</span>
-        <span>Tools</span>
-      </button>
+      <button class="tab-btn active" data-app="command">Command</button>
+      <button class="tab-btn" data-app="weather">Weather</button>
+      <button class="tab-btn" data-app="calendar">Calendar</button>
+      <button class="tab-btn" data-app="legislation">Legislation</button>
+      <button class="tab-btn" data-app="news">News</button>
+      <button class="tab-btn" data-app="metrics">Metrics</button>
+      <button class="tab-btn" data-app="tools">Tools</button>
     </nav>
 
   </div>
 
-  <!-- Core dashboard router / clock / tab loader -->
   <script src="media/js/core.js"></script>
 </body>
 </html>

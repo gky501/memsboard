@@ -1,1 +1,15 @@
+.calendar-hero::after {
+  background:
+    radial-gradient(circle, rgba(244, 123, 38, 0.22), transparent 62%);
+  box-shadow: 0 0 90px rgba(244, 123, 38, 0.18);
+}
 
+.calendar-row .row-icon {
+  background: rgba(244, 123, 38, 0.18);
+  color: var(--mems-orange);
+}
+
+.calendar-row .row-tag {
+  border-color: rgba(244, 123, 38, 0.24);
+  background: rgba(244, 123, 38, 0.1);
+}

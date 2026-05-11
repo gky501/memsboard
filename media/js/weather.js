@@ -269,14 +269,39 @@ function getTodayLow(periods) {
 function getWeatherSymbol(text) {
   const lower = String(text || "").toLowerCase();
 
-  if (lower.includes("thunder")) return "⛈";
-  if (lower.includes("rain") || lower.includes("showers")) return "🌧";
-  if (lower.includes("snow")) return "❄";
-  if (lower.includes("cloud")) return "☁";
-  if (lower.includes("sun") || lower.includes("clear")) return "☀";
-  if (lower.includes("fog")) return "≋";
+  if (lower.includes("thunder") || lower.includes("storm")) {
+    return `<i class="las la-bolt"></i>`;
+  }
 
-  return "◌";
+  if (lower.includes("rain") || lower.includes("showers")) {
+    return `<i class="las la-cloud-rain"></i>`;
+  }
+
+  if (lower.includes("snow") || lower.includes("sleet") || lower.includes("ice")) {
+    return `<i class="las la-snowflake"></i>`;
+  }
+
+  if (lower.includes("fog") || lower.includes("haze")) {
+    return `<i class="las la-smog"></i>`;
+  }
+
+  if (lower.includes("cloud") && lower.includes("sun")) {
+    return `<i class="las la-cloud-sun"></i>`;
+  }
+
+  if (lower.includes("cloud") || lower.includes("overcast")) {
+    return `<i class="las la-cloud"></i>`;
+  }
+
+  if (lower.includes("sun") || lower.includes("clear")) {
+    return `<i class="las la-sun"></i>`;
+  }
+
+  if (lower.includes("wind")) {
+    return `<i class="las la-wind"></i>`;
+  }
+
+  return `<i class="las la-circle"></i>`;
 }
 
 function setWeatherText(id, value, html = false) {
